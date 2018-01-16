@@ -107,4 +107,20 @@ public class Book extends Base {
         }        
         return true;
     }
+    public boolean updateAccount(int new_amount,String username) throws SQLException{
+        String sql="";
+        try{
+            getConnection();
+            sql="UPDATE ACCOUNT SET Credit_Balance=? WHERE Username =?";
+            pst=conn.prepareStatement(sql);
+            pst.setInt(1,new_amount);
+            pst.setString(2,username);
+            pst.execute();
+         }catch(Exception ex){
+            ex.printStackTrace();
+        }finally{
+            closeConnection();
+        }
+        return true;
+    }
 }

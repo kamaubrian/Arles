@@ -173,8 +173,8 @@ public class User extends Base{
               public boolean updateAccount(int credit,String username) throws SQLException{
                   String sql;
                   try{
-                      getConnection();
-                      sql="UPDATE ACCOUNT SET Credit_Balance =? WHERE Username =? ";
+                      getConnection(); 
+                      sql="UPDATE ACCOUNT SET Credit_Balance = ? WHERE Username = ? ";
                       pst=conn.prepareStatement(sql);
                       pst.setInt(1, credit);
                       pst.setString(2, username);

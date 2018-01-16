@@ -12,6 +12,9 @@ import java.util.List;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.swing.JOptionPane;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
@@ -85,13 +88,18 @@ public class RequestCar {
         public void actionPerformed(ActionEvent e) {
           int credit_balance;
           int price;
+          int new_credit_balance;
             try{
                 credit_balance = (int) usermodel.getCreditBalance(bookingview.getUsername().getText()).get(0);
                 price = (int) bookingview.getTotalPrice().getValue();
+                new_credit_balance=credit_balance-price;
+
                 if(credit_balance < price){
                     JOptionPane.showMessageDialog(bookingview,"Insufficient Funds to Complete Transaction");
                 }else{
-                    createDocumentFile("receipt.docx");
+                    System.out.println(new_credit_balance);
+                    bookingmodel.updateAccount(new_credit_balance,getUsername());
+                  
                     String username =bookingview.getUsername().getText();
                     String make = bookingview.getMake().getText();
                     String model =bookingview.getModel().getText();
@@ -99,6 +107,7 @@ public class RequestCar {
                     int hours_booked = (int) bookingview.getNumberOfHours().getValue();
                     int total_price =(int) bookingview.getTotalPrice().getValue();
                     bookingmodel.makeBooking(username, make, model, hourly_price, hours_booked, total_price);
+                    createDocumentFile(getUsername()+".docx",username,model,make,credit_balance,total_price,new_credit_balance);
                     JOptionPane.showMessageDialog(bookingview,"Transaction Completed Successfully");
                     bookingview.dispose();
                     
@@ -238,7 +247,8 @@ public class RequestCar {
     public static String getUsername(){
         return request.getUsername().getText();
     }
-    public static void createDocumentFile(String filename){
+    public static void createDocumentFile(String filename,String username,String model,String make,
+            int initial_balance,int total_price,int new_balance){
         try{
             File file = new File(filename);
             FileOutputStream outputstraeam = new FileOutputStream(file.getAbsoluteFile());
@@ -247,8 +257,19 @@ public class RequestCar {
             XWPFParagraph temp_paragraph = document.createParagraph();
             XWPFRun temp_run = temp_paragraph.createRun();
             
-            temp_run.setText("Sample Text");
-            temp_run.setFontSize(12);
+            temp_run.setText("Arles Car Rental Receipt\n");
+            temp_run.setText("************************\n");
+            temp_run.setText("Created On: "+getCurrentDate()+"\n\n");
+            temp_run.setText("Customer Name: "+username+"\n");
+            temp_run.setText("Car Make: "+make+"\n");
+            temp_run.setText("Car Model: "+model+"\n");
+            temp_run.setText("Initial Balance: " + initial_balance+"\n");
+            temp_run.setText("Total Charges: "+total_price+"\n");
+            temp_run.setText("Remaining Balance: " + new_balance+"\n");
+            temp_run.setText("************************\n");
+
+            temp_run.setFontSize(14);
+   
             document.write(outputstraeam);
             outputstraeam.close();
             
@@ -256,5 +277,17 @@ public class RequestCar {
             ex.printStackTrace();
         }
     }
+    public static String getCurrentDate(){
+       String current_timestamp ="";
+        try{             
+        DateFormat dateformat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Date date = new Date();
+        current_timestamp = dateformat.format(date);
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }       
+        return current_timestamp;
+    }
+    
     
 }
