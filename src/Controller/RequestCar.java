@@ -8,12 +8,14 @@ import javax.swing.JFrame;
 import View.*;
 import java.awt.event.ActionEvent;
 import Model.*;
-import java.awt.FlowLayout;
 import java.util.List;
 import java.awt.event.ActionListener;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
+import java.io.File;
+import java.io.FileOutputStream;
 import javax.swing.JOptionPane;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.apache.poi.xwpf.usermodel.XWPFRun;
 /**
  *
  * 
@@ -89,6 +91,7 @@ public class RequestCar {
                 if(credit_balance < price){
                     JOptionPane.showMessageDialog(bookingview,"Insufficient Funds to Complete Transaction");
                 }else{
+                    createDocumentFile("receipt.docx");
                     String username =bookingview.getUsername().getText();
                     String make = bookingview.getMake().getText();
                     String model =bookingview.getModel().getText();
@@ -106,7 +109,12 @@ public class RequestCar {
             }
             
           
+            
+          
         }
+          public static void GeneratePdf(){
+                //PdfDocument doc = new PdfDocument();
+            }
         
         
         
@@ -229,6 +237,24 @@ public class RequestCar {
     
     public static String getUsername(){
         return request.getUsername().getText();
+    }
+    public static void createDocumentFile(String filename){
+        try{
+            File file = new File(filename);
+            FileOutputStream outputstraeam = new FileOutputStream(file.getAbsoluteFile());
+            
+            XWPFDocument document = new XWPFDocument();
+            XWPFParagraph temp_paragraph = document.createParagraph();
+            XWPFRun temp_run = temp_paragraph.createRun();
+            
+            temp_run.setText("Sample Text");
+            temp_run.setFontSize(12);
+            document.write(outputstraeam);
+            outputstraeam.close();
+            
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
     }
     
 }
